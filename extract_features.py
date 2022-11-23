@@ -25,7 +25,9 @@ import re
 
 import modeling
 import tokenization
-import tensorflow as tf
+#import tensorflow as tf
+import tensorflow.compat.v1 as tf
+import tensorflow.compat.v1.estimator as contrib
 
 flags = tf.flags
 
