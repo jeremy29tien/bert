@@ -70,6 +70,7 @@ with open('tmp/sentence_output.jsonl') as embedding_file:
         data.append(result)
 
     # data has embeddings of sentences
+    # RABBIT VS. TURTLE
     slightly_faster_words = data[0]['features']
     slightly_faster_embedding = []
     for word_embedding in slightly_faster_words:
@@ -94,12 +95,44 @@ with open('tmp/sentence_output.jsonl') as embedding_file:
         alittle_faster_embedding.append(word_embedding['layers'][0]['values'])
     alittle_faster_embedding = np.mean(np.asarray(alittle_faster_embedding), axis=0)
 
+    # PLANE VS. CAR
+    slightly_larger_words = data[4]['features']
+    slightly_larger_embedding = []
+    for word_embedding in slightly_larger_words:
+        slightly_larger_embedding.append(word_embedding['layers'][0]['values'])
+    slightly_larger_embedding = np.mean(np.asarray(slightly_larger_embedding), axis=0)
+
+    larger_words = data[5]['features']
+    larger_embedding = []
+    for word_embedding in larger_words:
+        larger_embedding.append(word_embedding['layers'][0]['values'])
+    larger_embedding = np.mean(np.asarray(larger_embedding), axis=0)
+
+    much_larger_words = data[6]['features']
+    much_larger_embedding = []
+    for word_embedding in much_larger_words:
+        much_larger_embedding.append(word_embedding['layers'][0]['values'])
+    much_larger_embedding = np.mean(np.asarray(much_larger_embedding), axis=0)
+
+    alittle_larger_words = data[7]['features']
+    alittle_larger_embedding = []
+    for word_embedding in alittle_larger_words:
+        alittle_larger_embedding.append(word_embedding['layers'][0]['values'])
+    alittle_larger_embedding = np.mean(np.asarray(alittle_larger_embedding), axis=0)
+
+
     print("COSINE DISTANCE (1 - cosine_similarity):")
     print("(slightly faster) - (faster) = ", spatial.distance.cosine(slightly_faster_embedding, faster_embedding))
     print("(much faster) - (faster) = ", spatial.distance.cosine(much_faster_embedding, faster_embedding))
     print("(slightly faster) - (much faster) = ", spatial.distance.cosine(slightly_faster_embedding, much_faster_embedding))
     print("(a little faster) - (faster) = ", spatial.distance.cosine(alittle_faster_embedding, faster_embedding))
     print("(slightly faster) - (a little faster) = ", spatial.distance.cosine(slightly_faster_embedding, alittle_faster_embedding))
+
+    print("(slightly larger) - (larger) = ", spatial.distance.cosine(slightly_larger_embedding, larger_embedding))
+    print("(much larger) - (larger) = ", spatial.distance.cosine(much_larger_embedding, larger_embedding))
+    print("(slightly larger) - (much larger) = ", spatial.distance.cosine(slightly_larger_embedding, much_larger_embedding))
+    print("(a little larger) - (larger) = ", spatial.distance.cosine(alittle_larger_embedding, larger_embedding))
+    print("(slightly larger) - (a little larger) = ", spatial.distance.cosine(slightly_larger_embedding, alittle_larger_embedding))
 
 
 
