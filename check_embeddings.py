@@ -1,4 +1,5 @@
 import json
+import numpy as np
 
 # Opening JSON file
 with open('tmp/output.jsonl') as embedding_file:
@@ -21,8 +22,16 @@ with open('tmp/output.jsonl') as embedding_file:
     queen_tok_embedding = data[1]['features'][1]['layers'][0]['values']
     prince_tok_embedding = data[2]['features'][1]['layers'][0]['values']
 
+    king_tok_embedding = np.asarray(king_tok_embedding)
+    queen_tok_embedding = np.asarray(queen_tok_embedding)
+    prince_tok_embedding = np.asarray(prince_tok_embedding)
+
     print("king_tok_embedding:", king_tok_embedding)
     print("queen_tok_embedding:", queen_tok_embedding)
     print("prince_tok_embedding:", prince_tok_embedding)
+
+    print("king - queen = ", np.linalg.norm(king_tok_embedding - queen_tok_embedding))
+    print("king - prince = ", np.linalg.norm(king_tok_embedding - prince_tok_embedding))
+    print("queen - prince = ", np.linalg.norm(queen_tok_embedding - prince_tok_embedding))
 
 
