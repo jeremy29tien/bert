@@ -1,5 +1,6 @@
 import json
 import numpy as np
+from scipy import spatial
 
 print("---SINGLE WORD EMBEDDINGS---")
 with open('tmp/output.jsonl') as embedding_file:
@@ -36,6 +37,7 @@ with open('tmp/output.jsonl') as embedding_file:
     print("chair_tok_embedding:", chair_tok_embedding)
     print("guitar_tok_embedding:", guitar_tok_embedding)
 
+    print("EUCLIDEAN DISTANCE (L2 norm):")
     print("king - queen = ", np.linalg.norm(king_tok_embedding - queen_tok_embedding))
     print("king - prince = ", np.linalg.norm(king_tok_embedding - prince_tok_embedding))
     print("queen - prince = ", np.linalg.norm(queen_tok_embedding - prince_tok_embedding))
@@ -46,6 +48,18 @@ with open('tmp/output.jsonl') as embedding_file:
     print("queen - guitar = ", np.linalg.norm(queen_tok_embedding - guitar_tok_embedding))
     print("prince - guitar = ", np.linalg.norm(prince_tok_embedding - guitar_tok_embedding))
     print("chair - guitar = ", np.linalg.norm(chair_tok_embedding - guitar_tok_embedding))
+
+    print("COSINE DISTANCE (1 - cosine_similarity):")
+    print("king - queen = ", spatial.distance.cosine(king_tok_embedding - queen_tok_embedding))
+    print("king - prince = ", spatial.distance.cosine(king_tok_embedding - prince_tok_embedding))
+    print("queen - prince = ", spatial.distance.cosine(queen_tok_embedding - prince_tok_embedding))
+    print("king - chair = ", spatial.distance.cosine(king_tok_embedding - chair_tok_embedding))
+    print("queen - chair = ", spatial.distance.cosine(queen_tok_embedding - chair_tok_embedding))
+    print("prince - chair = ", spatial.distance.cosine(prince_tok_embedding - chair_tok_embedding))
+    print("king - guitar = ", spatial.distance.cosine(king_tok_embedding - guitar_tok_embedding))
+    print("queen - guitar = ", spatial.distance.cosine(queen_tok_embedding - guitar_tok_embedding))
+    print("prince - guitar = ", spatial.distance.cosine(prince_tok_embedding - guitar_tok_embedding))
+    print("chair - guitar = ", spatial.distance.cosine(chair_tok_embedding - guitar_tok_embedding))
 
 print("---SENTENCE EMBEDDINGS---")
 with open('tmp/sentence_output.jsonl') as embedding_file:
@@ -60,6 +74,23 @@ with open('tmp/sentence_output.jsonl') as embedding_file:
     slightly_faster_embedding = []
     for word_embedding in slightly_faster_words:
         slightly_faster_embedding.append(word_embedding['layers'][0]['values'])
-    slightly_faster_embedding = np.asarray(slightly_faster_embedding)
-    print(slightly_faster_embedding.shape)
+    slightly_faster_embedding = np.mean(np.asarray(slightly_faster_embedding), axis=-1)
+
+    # data has embeddings of sentences
+    faster_words = data[1]['features']
+    faster_embedding = []
+    for word_embedding in faster_words:
+        faster_embedding.append(word_embedding['layers'][0]['values'])
+    faster_embedding = np.mean(np.asarray(faster_embedding), axis=-1)
+
+    # data has embeddings of sentences
+    much_faster_words = data[2]['features']
+    much_faster_embedding = []
+    for word_embedding in much_faster_words:
+        much_faster_embedding.append(word_embedding['layers'][0]['values'])
+    much_faster_embedding = np.mean(np.asarray(much_faster_embedding), axis=-1)
+
+    # print("(slightly faster) - (faster) = ", spatial.distance.cosine(slightly_faster_embedding - faster_embedding))
+    # print("king - prince = ", np.linalg.norm(king_tok_embedding - prince_tok_embedding))
+    # print("queen - prince = ", np.linalg.norm(queen_tok_embedding - prince_tok_embedding))
 
