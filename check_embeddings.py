@@ -74,21 +74,21 @@ with open('tmp/sentence_output.jsonl') as embedding_file:
     slightly_faster_embedding = []
     for word_embedding in slightly_faster_words:
         slightly_faster_embedding.append(word_embedding['layers'][0]['values'])
-    slightly_faster_embedding = np.mean(np.asarray(slightly_faster_embedding), axis=-1)
+    slightly_faster_embedding = np.mean(np.asarray(slightly_faster_embedding), axis=0)
 
     # data has embeddings of sentences
     faster_words = data[1]['features']
     faster_embedding = []
     for word_embedding in faster_words:
         faster_embedding.append(word_embedding['layers'][0]['values'])
-    faster_embedding = np.mean(np.asarray(faster_embedding), axis=-1)
+    faster_embedding = np.mean(np.asarray(faster_embedding), axis=0)
 
     # data has embeddings of sentences
     much_faster_words = data[2]['features']
     much_faster_embedding = []
     for word_embedding in much_faster_words:
         much_faster_embedding.append(word_embedding['layers'][0]['values'])
-    much_faster_embedding = np.mean(np.asarray(much_faster_embedding), axis=-1)
+    much_faster_embedding = np.mean(np.asarray(much_faster_embedding), axis=0)
 
     print("(slightly faster) - (faster) = ", spatial.distance.cosine(slightly_faster_embedding, faster_embedding))
     print("(much faster) - (faster) = ", spatial.distance.cosine(much_faster_embedding, faster_embedding))
