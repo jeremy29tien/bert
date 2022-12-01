@@ -37,5 +37,7 @@ with open('tmp/output.jsonl') as embedding_file:
     print("king - prince = ", np.linalg.norm(king_tok_embedding - prince_tok_embedding))
     print("queen - prince = ", np.linalg.norm(queen_tok_embedding - prince_tok_embedding))
     print("king - chair = ", np.linalg.norm(king_tok_embedding - chair_tok_embedding))
+    print("queen - chair = ", np.linalg.norm(queen_tok_embedding - chair_tok_embedding))
+    print("prince - chair = ", np.linalg.norm(prince_tok_embedding - chair_tok_embedding))
 
 
