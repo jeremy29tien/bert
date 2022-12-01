@@ -1,0 +1,5 @@
+king
+queen
+prince
+chair
+guitar
