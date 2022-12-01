@@ -1,3 +1,4 @@
 A rabbit is slightly faster than a turtle.
 A rabbit is faster than a turtle.
 A rabbit is much faster than a turtle.
+A rabbit is a little faster than a turtle.

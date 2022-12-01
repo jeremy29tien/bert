@@ -61,7 +61,7 @@ with open('tmp/output.jsonl') as embedding_file:
     print("prince - guitar = ", spatial.distance.cosine(prince_tok_embedding, guitar_tok_embedding))
     print("chair - guitar = ", spatial.distance.cosine(chair_tok_embedding, guitar_tok_embedding))
 
-print("---SENTENCE EMBEDDINGS---")
+print("\n---SENTENCE EMBEDDINGS---")
 with open('tmp/sentence_output.jsonl') as embedding_file:
     data_list = list(embedding_file)
     data = []
@@ -88,8 +88,18 @@ with open('tmp/sentence_output.jsonl') as embedding_file:
         much_faster_embedding.append(word_embedding['layers'][0]['values'])
     much_faster_embedding = np.mean(np.asarray(much_faster_embedding), axis=0)
 
+    alittle_faster_words = data[3]['features']
+    alittle_faster_embedding = []
+    for word_embedding in alittle_faster_words:
+        alittle_faster_embedding.append(word_embedding['layers'][0]['values'])
+    alittle_faster_embedding = np.mean(np.asarray(alittle_faster_embedding), axis=0)
+
     print("COSINE DISTANCE (1 - cosine_similarity):")
     print("(slightly faster) - (faster) = ", spatial.distance.cosine(slightly_faster_embedding, faster_embedding))
     print("(much faster) - (faster) = ", spatial.distance.cosine(much_faster_embedding, faster_embedding))
     print("(slightly faster) - (much faster) = ", spatial.distance.cosine(slightly_faster_embedding, much_faster_embedding))
+    print("(a little faster) - (faster) = ", spatial.distance.cosine(alittle_faster_embedding, faster_embedding))
+    print("(slightly faster) - (a little faster) = ", spatial.distance.cosine(slightly_faster_embedding, alittle_faster_embedding))
+
+
 
