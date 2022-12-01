@@ -1,7 +1,7 @@
 import json
 import numpy as np
 
-# Opening JSON file
+print("---SINGLE WORD EMBEDDINGS---")
 with open('tmp/output.jsonl') as embedding_file:
     data_list = list(embedding_file)
     # data = json.load(embedding_file)
@@ -47,4 +47,19 @@ with open('tmp/output.jsonl') as embedding_file:
     print("prince - guitar = ", np.linalg.norm(prince_tok_embedding - guitar_tok_embedding))
     print("chair - guitar = ", np.linalg.norm(chair_tok_embedding - guitar_tok_embedding))
 
+print("---SENTENCE EMBEDDINGS---")
+with open('tmp/sentence_output.jsonl') as embedding_file:
+    data_list = list(embedding_file)
+    data = []
+    for data_string in data_list:
+        result = json.loads(data_string)
+        data.append(result)
+
+    # data has embeddings of sentences
+    slightly_faster_words = data[0]['features']
+    slightly_faster_embedding = []
+    for word_embedding in slightly_faster_words:
+        slightly_faster_embedding.append(word_embedding['layers'][0]['values'])
+    slightly_faster_embedding = np.asarray(slightly_faster_embedding)
+    print(slightly_faster_embedding.shape)
 
