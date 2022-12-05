@@ -148,5 +148,12 @@ with open('tmp/sentence_output.jsonl') as embedding_file:
     print("(a little larger) - (larger) = ", spatial.distance.cosine(alittle_larger_embedding, larger_embedding))
     print("(slightly larger) - (a little larger) = ", spatial.distance.cosine(slightly_larger_embedding, alittle_larger_embedding))
 
+    print("\n---COMPARING DIFFERENCE VECTORS---")
+    print("(much faster) - (faster) vs. (much larger) - (larger)")
+    print("(much faster) - (faster) =", much_faster_embedding - faster_embedding)
+    print("||(much faster) - (faster) =||_2", np.linalg.norm(much_faster_embedding - faster_embedding))
+    print("(much larger) - (larger) =", much_larger_embedding - larger_embedding)
+    print("||(much larger) - (larger) =||_2", np.linalg.norm(much_larger_embedding - larger_embedding))
+    print("Cosine similarity:", 1-spatial.distance.cosine(much_faster_embedding-faster_embedding, much_larger_embedding-larger_embedding))
 
 
