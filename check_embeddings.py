@@ -160,5 +160,10 @@ with open('tmp/sentence_output.jsonl') as embedding_file:
     print("||(slightly faster) - (faster)||_2 =", np.linalg.norm(slightly_faster_embedding - faster_embedding))
     print("||(slightly larger) - (larger)||_2 =", np.linalg.norm(slightly_larger_embedding - larger_embedding))
     print("Cosine similarity:", 1-spatial.distance.cosine(slightly_faster_embedding-faster_embedding, slightly_larger_embedding-larger_embedding))
+    print("---")
+    print("(slightly faster) - (much faster) vs. (slightly larger) - (much larger)")
+    print("||(slightly faster) - (much faster)||_2 =", np.linalg.norm(slightly_faster_embedding - much_faster_embedding))
+    print("||(slightly larger) - (much larger)||_2 =", np.linalg.norm(slightly_larger_embedding - much_larger_embedding))
+    print("Cosine similarity:", 1-spatial.distance.cosine(slightly_faster_embedding-much_faster_embedding, slightly_larger_embedding-much_larger_embedding))
 
 
