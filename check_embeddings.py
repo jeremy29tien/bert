@@ -24,14 +24,18 @@ with open('tmp/output.jsonl') as embedding_file:
     prince_tok_embedding = data[2]['features'][1]['layers'][0]['values']
     chair_tok_embedding = data[3]['features'][1]['layers'][0]['values']
     guitar_tok_embedding = data[4]['features'][1]['layers'][0]['values']
+    fast_tok_embedding = data[5]['features'][1]['layers'][0]['values']
+    slow_tok_embedding = data[6]['features'][1]['layers'][0]['values']
 
     king_tok_embedding = np.asarray(king_tok_embedding)
     queen_tok_embedding = np.asarray(queen_tok_embedding)
     prince_tok_embedding = np.asarray(prince_tok_embedding)
     chair_tok_embedding = np.asarray(chair_tok_embedding)
     guitar_tok_embedding = np.asarray(guitar_tok_embedding)
+    fast_tok_embedding = np.asarray(fast_tok_embedding)
+    slow_tok_embedding = np.asarray(slow_tok_embedding)
 
-    # print("king_tok_embedding:", king_tok_embedding)
+    # print("king_tok_embedding:", king_tok_embeddßing)
     # print("queen_tok_embedding:", queen_tok_embedding)
     # print("prince_tok_embedding:", prince_tok_embedding)
     # print("chair_tok_embedding:", chair_tok_embedding)
@@ -60,6 +64,7 @@ with open('tmp/output.jsonl') as embedding_file:
     print("queen - guitar = ", spatial.distance.cosine(queen_tok_embedding, guitar_tok_embedding))
     print("prince - guitar = ", spatial.distance.cosine(prince_tok_embedding, guitar_tok_embedding))
     print("chair - guitar = ", spatial.distance.cosine(chair_tok_embedding, guitar_tok_embedding))
+    print("fast vs slow:", spatial.distance.cosine(fast_tok_embedding, slow_tok_embedding))
 
 print("\n---SENTENCE EMBEDDINGS---")
 with open('tmp/sentence_output.jsonl') as embedding_file:
