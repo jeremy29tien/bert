@@ -82,27 +82,30 @@ vocab_file = '/home/jeremy/bert-base/vocab.txt'
 bert_config_file = '/home/jeremy/bert-base/bert_config.json'
 init_checkpoint = '/home/jeremy/bert-base/bert_model.ckpt'
 batch_size = 8
+layers = "-1,-2,-3,-4"
+do_lower_case = True
+max_seq_length = 128
 def run_bert(nl_input):
     tf.logging.set_verbosity(tf.logging.INFO)
 
-    layer_indexes = [int(x) for x in FLAGS.layers.split(",")]
+    layer_indexes = [int(x) for x in layers.split(",")]
 
     bert_config = modeling.BertConfig.from_json_file(bert_config_file)
 
     tokenizer = tokenization.FullTokenizer(
-        vocab_file=vocab_file, do_lower_case=FLAGS.do_lower_case)
+        vocab_file=vocab_file, do_lower_case=True)
 
     is_per_host = tf.compat.v1.estimator.tpu.InputPipelineConfig.PER_HOST_V2
     run_config = tf.compat.v1.estimator.tpu.RunConfig(
-        master=FLAGS.master,
+        master=None,
         tpu_config=tf.compat.v1.estimator.tpu.TPUConfig(
-            num_shards=FLAGS.num_tpu_cores,
+            num_shards=8,
             per_host_input_for_training=is_per_host))
 
     examples = read_string(nl_input)
 
     features = convert_examples_to_features(
-        examples=examples, seq_length=FLAGS.max_seq_length, tokenizer=tokenizer)
+        examples=examples, seq_length=max_seq_length, tokenizer=tokenizer)
 
     unique_id_to_feature = {}
     for feature in features:
@@ -110,21 +113,21 @@ def run_bert(nl_input):
 
     model_fn = model_fn_builder(
         bert_config=bert_config,
-        init_checkpoint=FLAGS.init_checkpoint,
+        init_checkpoint=init_checkpoint,
         layer_indexes=layer_indexes,
-        use_tpu=FLAGS.use_tpu,
-        use_one_hot_embeddings=FLAGS.use_one_hot_embeddings)
+        use_tpu=False,
+        use_one_hot_embeddings=False)
 
     # If TPU is not available, this will fall back to normal Estimator on CPU
     # or GPU.
     estimator = tf.compat.v1.estimator.tpu.TPUEstimator(
-        use_tpu=FLAGS.use_tpu,
+        use_tpu=False,
         model_fn=model_fn,
         config=run_config,
         predict_batch_size=batch_size)
 
     input_fn = input_fn_builder(
-        features=features, seq_length=FLAGS.max_seq_length)
+        features=features, seq_length=max_seq_length)
 
     outputs = []
     # with codecs.getwriter("utf-8")(tf.gfile.Open(FLAGS.output_file,
