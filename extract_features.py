@@ -82,13 +82,11 @@ vocab_file = '/home/jeremy/bert-base/vocab.txt'
 bert_config_file = '/home/jeremy/bert-base/bert_config.json'
 init_checkpoint = '/home/jeremy/bert-base/bert_model.ckpt'
 batch_size = 8
-layers = "-1,-2,-3,-4"
+layer_indexes = [-1,-2,-3,-4]
 do_lower_case = True
 max_seq_length = 128
 def run_bert(nl_input):
     tf.logging.set_verbosity(tf.logging.INFO)
-
-    layer_indexes = [int(x) for x in layers.split(",")]
 
     bert_config = modeling.BertConfig.from_json_file(bert_config_file)
 
