@@ -78,6 +78,82 @@ flags.DEFINE_bool(
     "tf.nn.embedding_lookup will be used. On TPUs, this should be True "
     "since it is much faster.")
 
+vocab_file = '/home/jeremy/bert-base/vocab.txt'
+bert_config_file = '/home/jeremy/bert-base/bert_config.json'
+init_checkpoint = '/home/jeremy/bert-base/bert_model.ckpt'
+batch_size = 8
+def run_bert(nl_input):
+    tf.logging.set_verbosity(tf.logging.INFO)
+
+    layer_indexes = [int(x) for x in FLAGS.layers.split(",")]
+
+    bert_config = modeling.BertConfig.from_json_file(bert_config_file)
+
+    tokenizer = tokenization.FullTokenizer(
+        vocab_file=vocab_file, do_lower_case=FLAGS.do_lower_case)
+
+    is_per_host = tf.compat.v1.estimator.tpu.InputPipelineConfig.PER_HOST_V2
+    run_config = tf.compat.v1.estimator.tpu.RunConfig(
+        master=FLAGS.master,
+        tpu_config=tf.compat.v1.estimator.tpu.TPUConfig(
+            num_shards=FLAGS.num_tpu_cores,
+            per_host_input_for_training=is_per_host))
+
+    examples = read_string(nl_input)
+
+    features = convert_examples_to_features(
+        examples=examples, seq_length=FLAGS.max_seq_length, tokenizer=tokenizer)
+
+    unique_id_to_feature = {}
+    for feature in features:
+        unique_id_to_feature[feature.unique_id] = feature
+
+    model_fn = model_fn_builder(
+        bert_config=bert_config,
+        init_checkpoint=FLAGS.init_checkpoint,
+        layer_indexes=layer_indexes,
+        use_tpu=FLAGS.use_tpu,
+        use_one_hot_embeddings=FLAGS.use_one_hot_embeddings)
+
+    # If TPU is not available, this will fall back to normal Estimator on CPU
+    # or GPU.
+    estimator = tf.compat.v1.estimator.tpu.TPUEstimator(
+        use_tpu=FLAGS.use_tpu,
+        model_fn=model_fn,
+        config=run_config,
+        predict_batch_size=batch_size)
+
+    input_fn = input_fn_builder(
+        features=features, seq_length=FLAGS.max_seq_length)
+
+    outputs = []
+    # with codecs.getwriter("utf-8")(tf.gfile.Open(FLAGS.output_file,
+    #                                              "w")) as writer:
+    for result in estimator.predict(input_fn, yield_single_examples=True):
+        unique_id = int(result["unique_id"])
+        feature = unique_id_to_feature[unique_id]
+        output_json = collections.OrderedDict()
+        output_json["linex_index"] = unique_id
+        all_features = []
+        for (i, token) in enumerate(feature.tokens):
+            all_layers = []
+            for (j, layer_index) in enumerate(layer_indexes):
+                layer_output = result["layer_output_%d" % j]
+                layers = collections.OrderedDict()
+                layers["index"] = layer_index
+                layers["values"] = [
+                    round(float(x), 6) for x in layer_output[i:(i + 1)].flat
+                ]
+                all_layers.append(layers)
+            features = collections.OrderedDict()
+            features["token"] = token
+            features["layers"] = all_layers
+            all_features.append(features)
+        output_json["features"] = all_features
+        # writer.write(json.dumps(output_json) + "\n")
+        outputs.append(output_json)
+    return outputs
+
 
 class InputExample(object):
 
@@ -359,79 +435,6 @@ def read_string(input):
         InputExample(unique_id=unique_id, text_a=text_a, text_b=text_b))
     unique_id += 1
     return examples
-
-
-def run_bert(nl_input):
-    tf.logging.set_verbosity(tf.logging.INFO)
-
-    layer_indexes = [int(x) for x in FLAGS.layers.split(",")]
-
-    bert_config = modeling.BertConfig.from_json_file(FLAGS.bert_config_file)
-
-    tokenizer = tokenization.FullTokenizer(
-        vocab_file=FLAGS.vocab_file, do_lower_case=FLAGS.do_lower_case)
-
-    is_per_host = tf.compat.v1.estimator.tpu.InputPipelineConfig.PER_HOST_V2
-    run_config = tf.compat.v1.estimator.tpu.RunConfig(
-        master=FLAGS.master,
-        tpu_config=tf.compat.v1.estimator.tpu.TPUConfig(
-            num_shards=FLAGS.num_tpu_cores,
-            per_host_input_for_training=is_per_host))
-
-    examples = read_string(nl_input)
-
-    features = convert_examples_to_features(
-        examples=examples, seq_length=FLAGS.max_seq_length, tokenizer=tokenizer)
-
-    unique_id_to_feature = {}
-    for feature in features:
-        unique_id_to_feature[feature.unique_id] = feature
-
-    model_fn = model_fn_builder(
-        bert_config=bert_config,
-        init_checkpoint=FLAGS.init_checkpoint,
-        layer_indexes=layer_indexes,
-        use_tpu=FLAGS.use_tpu,
-        use_one_hot_embeddings=FLAGS.use_one_hot_embeddings)
-
-    # If TPU is not available, this will fall back to normal Estimator on CPU
-    # or GPU.
-    estimator = tf.compat.v1.estimator.tpu.TPUEstimator(
-        use_tpu=FLAGS.use_tpu,
-        model_fn=model_fn,
-        config=run_config,
-        predict_batch_size=FLAGS.batch_size)
-
-    input_fn = input_fn_builder(
-        features=features, seq_length=FLAGS.max_seq_length)
-
-    outputs = []
-    # with codecs.getwriter("utf-8")(tf.gfile.Open(FLAGS.output_file,
-    #                                              "w")) as writer:
-    for result in estimator.predict(input_fn, yield_single_examples=True):
-        unique_id = int(result["unique_id"])
-        feature = unique_id_to_feature[unique_id]
-        output_json = collections.OrderedDict()
-        output_json["linex_index"] = unique_id
-        all_features = []
-        for (i, token) in enumerate(feature.tokens):
-            all_layers = []
-            for (j, layer_index) in enumerate(layer_indexes):
-                layer_output = result["layer_output_%d" % j]
-                layers = collections.OrderedDict()
-                layers["index"] = layer_index
-                layers["values"] = [
-                    round(float(x), 6) for x in layer_output[i:(i + 1)].flat
-                ]
-                all_layers.append(layers)
-            features = collections.OrderedDict()
-            features["token"] = token
-            features["layers"] = all_layers
-            all_features.append(features)
-        output_json["features"] = all_features
-        # writer.write(json.dumps(output_json) + "\n")
-        outputs.append(output_json)
-    return outputs
 
 
 def main(_):
