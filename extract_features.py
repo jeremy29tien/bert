@@ -20,6 +20,7 @@ from __future__ import print_function
 
 import codecs
 import collections
+import io
 import json
 import re
 
@@ -419,22 +420,26 @@ def read_examples(input_file):
 
 
 def read_string(input):
-    """Read a list of `InputExample`s from an input string (without newlines)."""
+    """Read a list of `InputExample`s from an input string (possibly with newlines)."""
     examples = []
     unique_id = 0
-    line = tokenization.convert_to_unicode(input)
-    line = line.strip()
-    text_a = None
-    text_b = None
-    m = re.match(r"^(.*) \|\|\| (.*)$", line)
-    if m is None:
-        text_a = line
-    else:
-        text_a = m.group(1)
-        text_b = m.group(2)
-    examples.append(
-        InputExample(unique_id=unique_id, text_a=text_a, text_b=text_b))
-    unique_id += 1
+    with io.StringIO(input) as buf:
+        while True:
+            line = tokenization.convert_to_unicode(buf.readline())
+            if not line:
+                break
+            line = line.strip()
+            text_a = None
+            text_b = None
+            m = re.match(r"^(.*) \|\|\| (.*)$", line)
+            if m is None:
+                text_a = line
+            else:
+                text_a = m.group(1)
+                text_b = m.group(2)
+            examples.append(
+                InputExample(unique_id=unique_id, text_a=text_a, text_b=text_b))
+            unique_id += 1
     return examples
 
 
