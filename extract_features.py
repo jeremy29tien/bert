@@ -22,6 +22,7 @@ import codecs
 import collections
 import io
 import json
+import os
 import re
 
 import modeling
@@ -87,6 +88,7 @@ layer_indexes = [-1,-2,-3,-4]
 do_lower_case = True
 max_seq_length = 128
 def run_bert(nl_input):
+    os.environ["CUDA_VISIBLE_DEVICES"] = "1,2,3"
     tf.logging.set_verbosity(tf.logging.INFO)
 
     bert_config = modeling.BertConfig.from_json_file(bert_config_file)
