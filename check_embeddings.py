@@ -35,8 +35,8 @@ with open('tmp/output.jsonl') as embedding_file:
     fast_tok_embedding = np.asarray(fast_tok_embedding)
     slow_tok_embedding = np.asarray(slow_tok_embedding)
 
-    # print("king_tok_embedding:", king_tok_embeddßing)
-    # print("queen_tok_embedding:", queen_tok_embedding)
+    print("king_tok_embedding:", king_tok_embedding.shape)
+    print("queen_tok_embedding:", queen_tok_embedding.shape)
     # print("prince_tok_embedding:", prince_tok_embedding)
     # print("chair_tok_embedding:", chair_tok_embedding)
     # print("guitar_tok_embedding:", guitar_tok_embedding)

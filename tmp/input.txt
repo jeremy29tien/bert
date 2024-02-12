@@ -3,3 +3,5 @@ queen
 prince
 chair
 guitar
+fast
+slow
